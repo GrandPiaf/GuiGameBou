@@ -27,8 +27,8 @@
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-int width = 1200;
-int height = 1200;
+int width = 800;
+int height = 800;
 
 static void error_callback(int /*error*/, const char* description)
 {
@@ -151,7 +151,7 @@ int main(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
-	window = glfwCreateWindow(1200, 1200, "Simple example", NULL, NULL);
+	window = glfwCreateWindow(width, height, "Simple example", NULL, NULL);
 
 	if (!window)
 	{
@@ -256,7 +256,7 @@ int main(void)
 	glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, ct, 0);
 	glNamedFramebufferTexture(fbo, GL_DEPTH_ATTACHMENT, dt, 0);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	//Options
 	glPointSize(10.f);
@@ -286,8 +286,6 @@ int main(void)
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
-
-	//system("pause");
 
 	exit(EXIT_SUCCESS);
 }

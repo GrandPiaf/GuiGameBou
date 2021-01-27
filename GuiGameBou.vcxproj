@@ -71,10 +71,10 @@
     <IncludePath>D:\Cours\Gamagora\GuiGameBou\external\tinyply\include;D:\Cours\Gamagora\GuiGameBou\external\glad\include;D:\Cours\Gamagora\GuiGameBou\external\CImg\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\Cours\Gamagora\GuiGameBou\external\stb\include;D:\Cours\Gamagora\GuiGameBou\external\tinyply\include;D:\Cours\Gamagora\GuiGameBou\external\glad\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\external\tinyply\include;$(SolutionDir)\external\stb\include;$(SolutionDir)\external\glad\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>D:\Cours\Gamagora\GuiGameBou\external\stb\include;D:\Cours\Gamagora\GuiGameBou\external\tinyply\include;D:\Cours\Gamagora\GuiGameBou\external\glad\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\external\tinyply\include;$(SolutionDir)\external\stb\include;$(SolutionDir)\external\glad\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
