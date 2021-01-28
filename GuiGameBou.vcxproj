@@ -133,7 +133,6 @@
     <ClInclude Include="external\cimg\include\cimg\plugins\vtk.h" />
     <ClInclude Include="external\glad\include\glad\glad.h" />
     <ClInclude Include="external\glad\include\khr\khrplatform.h" />
-    <ClInclude Include="external\stb\include\stb_image.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="source\mesh.h" />
     <ClInclude Include="source\model.h" />
@@ -141,22 +140,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="resources\models\backpack\backpack.mtl" />
     <None Include="resources\shaders\shader.frag" />
     <None Include="resources\shaders\shader.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="resources\models\backpack\ao.jpg" />
-    <Image Include="resources\models\backpack\diffuse.jpg" />
-    <Image Include="resources\models\backpack\normal.png" />
-    <Image Include="resources\models\backpack\roughness.jpg" />
-    <Image Include="resources\models\backpack\specular.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="resources\models\backpack\backpack.obj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="resources\models\backpack\source_attribution.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -7,7 +7,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "shader.h"
 #include "mesh.h"
 
 class Model {

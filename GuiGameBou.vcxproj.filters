@@ -22,9 +22,6 @@
     <Filter Include="Resource Files\shaders">
       <UniqueIdentifier>{546844ce-932c-49c6-8b3f-3979e5309178}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\models\backpack">
-      <UniqueIdentifier>{c181af73-686d-4d7a-bdfb-d3fdee4cac06}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="external\glad\src\glad.c">
@@ -104,9 +101,6 @@
     <ClInclude Include="external\glad\include\khr\khrplatform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -116,8 +110,8 @@
     <ClInclude Include="source\model.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="external\stb\include\stb_image.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="source\shader.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -128,35 +122,5 @@
     <None Include="resources\shaders\shader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="resources\models\backpack\backpack.mtl">
-      <Filter>Resource Files\models\backpack</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="resources\models\backpack\ao.jpg">
-      <Filter>Resource Files\models\backpack</Filter>
-    </Image>
-    <Image Include="resources\models\backpack\diffuse.jpg">
-      <Filter>Resource Files\models\backpack</Filter>
-    </Image>
-    <Image Include="resources\models\backpack\normal.png">
-      <Filter>Resource Files\models\backpack</Filter>
-    </Image>
-    <Image Include="resources\models\backpack\roughness.jpg">
-      <Filter>Resource Files\models\backpack</Filter>
-    </Image>
-    <Image Include="resources\models\backpack\specular.jpg">
-      <Filter>Resource Files\models\backpack</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="resources\models\backpack\backpack.obj">
-      <Filter>Resource Files\models\backpack</Filter>
-    </Object>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="resources\models\backpack\source_attribution.txt">
-      <Filter>Resource Files\models\backpack</Filter>
-    </Text>
   </ItemGroup>
 </Project>

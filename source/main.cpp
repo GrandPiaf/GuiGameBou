@@ -1,8 +1,3 @@
-
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -18,6 +13,7 @@
 #include <string>
 
 #include "shader.h"
+#include "model.h"
 
 /**
 ## TODO List :
@@ -25,7 +21,8 @@
 - Clean repositories DONE.
 - Clean source code DONE.
 - Create GLFW Window (resizeable) DONE.
-- Model loading & Meshes (trying with a simple cube at first) CURRENT...
+- Model loading & Meshes (trying with a simple cube at first) DONE.
+- Shader for Model & Meshes CURRENT...
 - Simple Phong lightning (not necessarly Spot & Point base, could be direct lightning only like from the sun)
 - Baked ShadowMap
 - Framebuffer
@@ -111,6 +108,7 @@ int main(void)
 	Shader program{ "resources/shaders/shader.vert", "resources/shaders/shader.frag" };
 	program.use();
 
+	Model backpack("resources/models/backpack/backpack.obj");
 
 	//Options
 	glEnable(GL_DEPTH_TEST);
@@ -126,7 +124,7 @@ int main(void)
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
 
