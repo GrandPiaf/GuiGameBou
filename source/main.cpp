@@ -22,8 +22,9 @@
 - Clean source code DONE.
 - Create GLFW Window (resizeable) DONE.
 - Model loading & Meshes (trying with a simple cube at first) DONE.
-- Shader for Model & Meshes CURRENT...
-- Simple Phong lightning (not necessarly Spot & Point base, could be direct lightning only like from the sun)
+- Shader for Model & Meshes DONE.
+- Camera controls
+- Simple Phong lightning (not necessarly Spot & Point base, could be direct lightning only like from the sun) DONE.
 - Baked ShadowMap
 - Framebuffer
 - SSAO
@@ -63,10 +64,6 @@ void APIENTRY opengl_error_callback(GLenum source,
 	std::cout << message << std::endl;
 }
 
-bool IsOutsideScreen(glm::vec3 pos) {
-	return pos.y < -1.0f || pos.x < -1.0f ||pos.x > 1.0f;
-}
-
 glm::vec3 ScreenCoordinatesToWorldCoordinates(double &xpos, double &ypos) {
 	return glm::vec3(xpos / width * 2.0f - 1.0f, (ypos / height * 2.0f - 1.0f) * -1.0f, 1.0f);
 }
@@ -104,6 +101,9 @@ int main(void)
 	// Callbacks
 	glDebugMessageCallback(opengl_error_callback, nullptr);
 
+	// Camera
+
+
 	// Shader program
 	Shader program{ "resources/shaders/shader.vert", "resources/shaders/shader.frag" };
 	program.use();
@@ -124,9 +124,9 @@ int main(void)
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-
+		program.use();
+		backpack.draw(program);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

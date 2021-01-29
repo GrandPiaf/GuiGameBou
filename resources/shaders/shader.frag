@@ -1,14 +1,15 @@
 #version 450
 
-uniform float time;
+uniform sampler2D texture_diffuse0;
 
-in vec3 particle_color;
+uniform sampler2D texture_specular0;
 
-out vec4 color;
+in vec3 normal;
+in vec2 texCoord;
 
+out vec4 FragColor;
 
 void main()
 {
-    // color = vec4((sin(time * 10) + 1.0f) / 2.0f * particle_color, 1.0f);
-    color = vec4(particle_color, 1.0f);
+    FragColor = mix(texture(texture_diffuse0, texCoord), texture(texture_specular0, texCoord), 0.2);
 }

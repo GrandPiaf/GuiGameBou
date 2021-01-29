@@ -1,20 +1,16 @@
 #version 450
 
-uniform float time;
-uniform vec3 colorA;
-uniform vec3 colorB;
-uniform vec2 mouse_position;
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
+layout (location = 2) in vec2 aTexCoord;
 
-in vec3 position;
-in vec3 color;
-in float pointSize;
-
-out vec3 particle_color;
+out vec3 normal;
+out vec2 texCoord;
 
 
 void main()
 {
-
-   
-
+    gl_Position = vec4(aPos, 1.0);
+    normal = aNormal;
+    texCoord = aTexCoord;
 }
