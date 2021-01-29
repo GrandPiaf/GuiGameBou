@@ -23,7 +23,7 @@
 - Create GLFW Window (resizeable) DONE.
 - Model loading & Meshes (trying with a simple cube at first) DONE.
 - Shader for Model & Meshes DONE.
-- Camera controls
+- Camera controls CURRENT...
 - Simple Phong lightning (not necessarly Spot & Point base, could be direct lightning only like from the sun) DONE.
 - Baked ShadowMap
 - Framebuffer
@@ -102,7 +102,10 @@ int main(void)
 	glDebugMessageCallback(opengl_error_callback, nullptr);
 
 	// Camera
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 
+	glm::mat4 view = glm::mat4(1.0f);
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
 
 	// Shader program
 	Shader program{ "resources/shaders/shader.vert", "resources/shaders/shader.frag" };
@@ -125,8 +128,17 @@ int main(void)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+
 		program.use();
+		program.setMat4("proj", proj);
+		program.setMat4("view", view);
+		program.setMat4("model", model);
+
 		backpack.draw(program);
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
