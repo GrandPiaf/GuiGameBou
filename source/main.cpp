@@ -30,37 +30,110 @@
 - SSAO
 **/
 
-// timing
+std::default_random_engine generator;
+std::uniform_real_distribution<float> distribution01(0, 1);
+std::uniform_real_distribution<float> distributionWorld(-1, 1);
+
+// Time
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 int width = 800;
 int height = 800;
 
-static void error_callback(int /*error*/, const char* description)
-{
+// Mouse movements
+bool firstMouse = true;
+float lastX = width / 2.0f;
+float lastY = height / 2.0f;
+float yaw = -90.0f;
+float pitch = 0.0f;
+float fov = 45.0f;
+
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+static void error_callback(int /*error*/, const char *description) {
 	std::cerr << "Error: " << description << std::endl;
 }
 
-static void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods*/)
-{
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
+static void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+	glViewport(0, 0, width, height);
 }
 
-std::default_random_engine generator;
-std::uniform_real_distribution<float> distribution01(0, 1);
-std::uniform_real_distribution<float> distributionWorld(-1, 1);
+static void key_callback(GLFWwindow *window) {
 
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
+
+	// Movements
+	float cameraSpeed = 5.0f * deltaTime; // adjust accordingly
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		cameraPos += cameraSpeed * cameraFront;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		cameraPos -= cameraSpeed * cameraFront;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	}
+}
+
+static void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+	if (firstMouse) { // initially set to true
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
+	lastX = xpos;
+	lastY = ypos;
+
+	const float sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	// Blocking player view to avoid lookAt flip
+	if (pitch > 89.0f) {
+		pitch = 89.0f;
+	}
+	if (pitch < -89.0f) {
+		pitch = -89.0f;
+	}
+
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(direction);
+}
+
+static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+	fov -= (float)yoffset;
+	if (fov < 1.0f) {
+		fov = 1.0f;
+	}
+	if (fov > 45.0f) {
+		fov = 45.0f;
+	}
+}
 
 void APIENTRY opengl_error_callback(GLenum source,
-		GLenum type,
-		GLuint id,
-		GLenum severity,
-		GLsizei length,
-		const GLchar *message,
-		const void *userParam)
-{
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar *message,
+	const void *userParam) {
 	std::cout << message << std::endl;
 }
 
@@ -68,9 +141,8 @@ glm::vec3 ScreenCoordinatesToWorldCoordinates(double &xpos, double &ypos) {
 	return glm::vec3(xpos / width * 2.0f - 1.0f, (ypos / height * 2.0f - 1.0f) * -1.0f, 1.0f);
 }
 
-int main(void)
-{
-	GLFWwindow* window;
+int main(void) {
+	GLFWwindow *window;
 	glfwSetErrorCallback(error_callback);
 
 	if (!glfwInit())
@@ -80,63 +152,70 @@ int main(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
-	window = glfwCreateWindow(width, height, "Simple example", NULL, NULL);
+	window = glfwCreateWindow(width, height, "GuiGameBou", NULL, NULL);
 
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
 
-	glfwSetKeyCallback(window, key_callback);
 	glfwMakeContextCurrent(window);
+
 	glfwSwapInterval(1);
 	// NOTE: OpenGL error checks have been omitted for brevity
 
-	if(!gladLoadGL()) {
+	if (!gladLoadGL()) {
 		std::cerr << "Something went wrong!" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	// Callbacks
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 	glDebugMessageCallback(opengl_error_callback, nullptr);
-
-	// Camera
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-
-	glm::mat4 view = glm::mat4(1.0f);
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
 
 	// Shader program
 	Shader program{ "resources/shaders/shader.vert", "resources/shaders/shader.frag" };
 	program.use();
 
+	// Models
 	Model backpack("resources/models/backpack/backpack.obj");
 
 	//Options
 	glEnable(GL_DEPTH_TEST);
 
-	while (!glfwWindowShouldClose(window))
-	{
+	glm::mat4 view;
+	glm::mat4 proj;
+
+	while (!glfwWindowShouldClose(window)) {
+
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		key_callback(window);
+
 		glfwGetFramebufferSize(window, &width, &height);
-		glViewport(0, 0, width, height);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//Camera
+		proj = glm::perspective(glm::radians(fov), (float)width / (float)height, 0.1f, 100.0f);
+		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		program.use();
 		program.setMat4("proj", proj);
 		program.setMat4("view", view);
 		program.setMat4("model", model);
+		backpack.draw(program);
 
+		model = glm::translate(model, glm::vec3(10.0f, 0.0f, 0.0f));
+		program.setMat4("model", model);
 		backpack.draw(program);
 
 
