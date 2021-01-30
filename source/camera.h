@@ -65,4 +65,8 @@ class Camera {
 			return m_fov;
 		}
 
+		inline glm::vec3 getPosition() const {
+			return m_position;
+		}
+
 };
