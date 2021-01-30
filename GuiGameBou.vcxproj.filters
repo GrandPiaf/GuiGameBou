@@ -39,6 +39,9 @@
     <ClCompile Include="source\model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\cimg\include\CImg.h">
@@ -111,6 +114,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="source\shader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\camera.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

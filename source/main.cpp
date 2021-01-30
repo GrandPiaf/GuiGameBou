@@ -14,6 +14,8 @@
 
 #include "shader.h"
 #include "model.h"
+#include "camera.h"
+#include <stb_image.h>
 
 /**
 ## TODO List :
@@ -23,8 +25,8 @@
 - Create GLFW Window (resizeable) DONE.
 - Model loading & Meshes (trying with a simple cube at first) DONE.
 - Shader for Model & Meshes DONE.
-- Camera controls CURRENT...
-- Simple Phong lightning (not necessarly Spot & Point base, could be direct lightning only like from the sun) DONE.
+- Camera controls DONE.
+- Simple Phong lightning (not necessarly Spot & Point base, could be direct lightning only like from the sun) CURRENT...
 - Baked ShadowMap
 - Framebuffer
 - SSAO
@@ -41,17 +43,11 @@ float lastFrame = 0.0f;
 int width = 800;
 int height = 800;
 
-// Mouse movements
+// Camera
+Camera camera;
 bool firstMouse = true;
 float lastX = width / 2.0f;
 float lastY = height / 2.0f;
-float yaw = -90.0f;
-float pitch = 0.0f;
-float fov = 45.0f;
-
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 static void error_callback(int /*error*/, const char *description) {
 	std::cerr << "Error: " << description << std::endl;
@@ -62,24 +58,21 @@ static void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 }
 
 static void key_callback(GLFWwindow *window) {
-
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	// Movements
-	float cameraSpeed = 5.0f * deltaTime; // adjust accordingly
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		cameraPos += cameraSpeed * cameraFront;
+		camera.keyProcess(CameraMovement::FORWARD, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		cameraPos -= cameraSpeed * cameraFront;
+		camera.keyProcess(CameraMovement::BACKWARD, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.keyProcess(CameraMovement::LEFT, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.keyProcess(CameraMovement::RIGHT, deltaTime);
 	}
 }
 
@@ -95,36 +88,11 @@ static void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 	lastX = xpos;
 	lastY = ypos;
 
-	const float sensitivity = 0.1f;
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
-
-	yaw += xoffset;
-	pitch += yoffset;
-
-	// Blocking player view to avoid lookAt flip
-	if (pitch > 89.0f) {
-		pitch = 89.0f;
-	}
-	if (pitch < -89.0f) {
-		pitch = -89.0f;
-	}
-
-	glm::vec3 direction;
-	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	direction.y = sin(glm::radians(pitch));
-	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraFront = glm::normalize(direction);
+	camera.mouseProcess(xoffset, yoffset);
 }
 
 static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-	fov -= (float)yoffset;
-	if (fov < 1.0f) {
-		fov = 1.0f;
-	}
-	if (fov > 45.0f) {
-		fov = 45.0f;
-	}
+	camera.scrollProcess(yoffset);
 }
 
 void APIENTRY opengl_error_callback(GLenum source,
@@ -176,6 +144,8 @@ int main(void) {
 	glfwSetScrollCallback(window, scroll_callback);
 	glDebugMessageCallback(opengl_error_callback, nullptr);
 
+	stbi_set_flip_vertically_on_load(true);
+
 	// Shader program
 	Shader program{ "resources/shaders/shader.vert", "resources/shaders/shader.frag" };
 	program.use();
@@ -203,8 +173,8 @@ int main(void) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Camera
-		proj = glm::perspective(glm::radians(fov), (float)width / (float)height, 0.1f, 100.0f);
-		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		proj = glm::perspective(glm::radians(camera.getFov()), (float)width / (float)height, 0.1f, 100.0f);
+		view = camera.getViewMatrix();
 
 		glm::mat4 model = glm::mat4(1.0f);
 
