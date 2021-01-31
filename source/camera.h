@@ -69,4 +69,8 @@ class Camera {
 			return m_position;
 		}
 
+		inline glm::vec3 getFront() const {
+			return m_front;
+		}
+
 };

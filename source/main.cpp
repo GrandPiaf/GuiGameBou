@@ -26,8 +26,9 @@
 - Model loading & Meshes (trying with a simple cube at first) DONE.
 - Shader for Model & Meshes DONE.
 - Camera controls DONE.
-- Simple Phong lightning (not necessarly Spot & Point base, could be direct lightning only like from the sun) CURRENT...
-- Baked ShadowMap
+- Simple Phong lightning DONE.
+- Multiple lights CURRENT...
+- ShadowMap
 - Framebuffer
 - SSAO
 **/
@@ -116,7 +117,7 @@ int main(void) {
 	Shader modelShader{ "resources/shaders/shader.vert", "resources/shaders/shader.frag" };
 	modelShader.use();
 
-	Shader lightPositionShader{ "resources/shaders/lightShader.vert", "resources/shaders/lightShader.frag" };
+	//Shader lightPositionShader{ "resources/shaders/lightShader.vert", "resources/shaders/lightShader.frag" };
 
 	// Models
 	Model backpack("resources/models/backpack/backpack.obj");
@@ -149,13 +150,18 @@ int main(void) {
 		modelShader.setMat4("view", view);
 		modelShader.setVec3("viewPos", camera.getPosition());
 
+		modelShader.setVec3("light.position", camera.getPosition());
+		modelShader.setVec3("light.direction", camera.getFront());
+		modelShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f))); //Giving the cosine value of the actual angle to compare with the cosine value of the fragment in the shader
+		modelShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+
 		modelShader.setFloat("material.shininess", 32.0f); //TODO : extract from assimp model
 
 		//modelShader.setVec4("light.lightVector", glm::vec4(-lightPos, 0.0f)); // Directional light
-		modelShader.setVec4("light.lightVector", glm::vec4(lightPos, 1.0f)); // Point light
+		//modelShader.setVec4("light.lightVector", glm::vec4(lightPos, 1.0f)); // Point light
 
-		modelShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-		modelShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+		modelShader.setVec3("light.ambient", 0.1f, 0.1f, 0.1f);
+		modelShader.setVec3("light.diffuse", 0.8f, 0.8f, 0.8f);
 		modelShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
 		modelShader.setFloat("light.constant", 1.0f);
@@ -164,28 +170,31 @@ int main(void) {
 
 		// world transformation
 		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 		modelShader.setMat4("model", model);
 
-		for (unsigned int i = 0; i < 10; i++) {
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			//model = glm::scale(model, glm::vec3(0.2f));
-			modelShader.setMat4("model", model);
+		backpack.draw(modelShader);
 
-			backpack.draw(modelShader);
-		}
+		//for (unsigned int i = 0; i < 10; i++) {
+		//	glm::mat4 model = glm::mat4(1.0f);
+		//	model = glm::translate(model, cubePositions[i]);
+		//	float angle = 20.0f * i;
+		//	model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		//	//model = glm::scale(model, glm::vec3(0.2f));
+		//	modelShader.setMat4("model", model);
+
+		//	backpack.draw(modelShader);
+		//}
 
 		//Light position shader
-		lightPositionShader.use();
-		lightPositionShader.setMat4("projection", proj);
-		lightPositionShader.setMat4("view", view);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-		lightPositionShader.setMat4("model", model);
-		backpack.draw(lightPositionShader);
+		//lightPositionShader.use();
+		//lightPositionShader.setMat4("projection", proj);
+		//lightPositionShader.setMat4("view", view);
+		//model = glm::mat4(1.0f);
+		//model = glm::translate(model, lightPos);
+		//model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+		//lightPositionShader.setMat4("model", model);
+		//backpack.draw(lightPositionShader);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

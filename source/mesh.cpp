@@ -40,6 +40,7 @@ void Mesh::draw(Shader &shader) {
 	
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
+	unsigned int normalsNr = 1;
 
 	for (size_t i = 0; i < textures.size(); i++){
 
@@ -54,6 +55,9 @@ void Mesh::draw(Shader &shader) {
 		} else if (name.compare("texture_specular") == 0) {
 			number = std::to_string(specularNr++); // post increment
 		}
+		//} else if (name.compare("texture_normals") == 0) {
+		//	number = std::to_string(normalsNr++); // post increment
+		//}
 
 		//shader.setFloat(("material." + name + number).c_str(), i);
 		shader.setFloat(("material." + name + number).c_str(), i);
