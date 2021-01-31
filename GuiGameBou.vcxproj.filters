@@ -128,5 +128,11 @@
     <None Include="resources\shaders\shader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="resources\shaders\lightShader.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="resources\shaders\lightShader.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

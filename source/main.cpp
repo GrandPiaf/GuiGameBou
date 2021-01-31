@@ -59,6 +59,19 @@ float lastY = height / 2.0f;
 // lighting
 glm::vec3 lightPos(2.5f, 0.0f, 0.0f);
 
+glm::vec3 cubePositions[] = {
+	glm::vec3(0.0f,  0.0f,  0.0f),
+	glm::vec3(2.0f,  5.0f, -15.0f),
+	glm::vec3(-1.5f, -2.2f, -2.5f),
+	glm::vec3(-3.8f, -2.0f, -12.3f),
+	glm::vec3(2.4f, -0.4f, -3.5f),
+	glm::vec3(-1.7f,  3.0f, -7.5f),
+	glm::vec3(1.3f, -2.0f, -2.5f),
+	glm::vec3(1.5f,  2.0f, -2.5f),
+	glm::vec3(1.5f,  0.2f, -1.5f),
+	glm::vec3(-1.3f,  1.0f, -1.5f)
+};
+
 int main(void) {
 	GLFWwindow *window;
 	glfwSetErrorCallback(error_callback);
@@ -100,8 +113,10 @@ int main(void) {
 	//stbi_set_flip_vertically_on_load(true);
 
 	// Shader program
-	Shader program{ "resources/shaders/shader.vert", "resources/shaders/shader.frag" };
-	program.use();
+	Shader modelShader{ "resources/shaders/shader.vert", "resources/shaders/shader.frag" };
+	modelShader.use();
+
+	Shader lightPositionShader{ "resources/shaders/lightShader.vert", "resources/shaders/lightShader.frag" };
 
 	// Models
 	Model backpack("resources/models/backpack/backpack.obj");
@@ -129,35 +144,48 @@ int main(void) {
 		proj = glm::perspective(glm::radians(camera.getFov()), (float)width / (float)height, 0.1f, 100.0f);
 		view = camera.getViewMatrix();
 
+		modelShader.use();
+		modelShader.setMat4("proj", proj);
+		modelShader.setMat4("view", view);
+		modelShader.setVec3("viewPos", camera.getPosition());
+
+		modelShader.setFloat("material.shininess", 32.0f); //TODO : extract from assimp model
+
+		//modelShader.setVec4("light.lightVector", glm::vec4(-lightPos, 0.0f)); // Directional light
+		modelShader.setVec4("light.lightVector", glm::vec4(lightPos, 1.0f)); // Point light
+
+		modelShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		modelShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+		modelShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+		modelShader.setFloat("light.constant", 1.0f);
+		modelShader.setFloat("light.linear", 0.09f);
+		modelShader.setFloat("light.quadratic", 0.032f);
+
+		// world transformation
 		glm::mat4 model = glm::mat4(1.0f);
+		modelShader.setMat4("model", model);
 
-		program.use();
-		program.setMat4("proj", proj);
-		program.setMat4("view", view);
-		program.setMat4("model", model);
+		for (unsigned int i = 0; i < 10; i++) {
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			//model = glm::scale(model, glm::vec3(0.2f));
+			modelShader.setMat4("model", model);
 
-		program.setFloat("material.shininess", 32.0f);
+			backpack.draw(modelShader);
+		}
 
-		program.setVec3("light.position", lightPos);
-		program.setVec3("viewPos", camera.getPosition());
-		glm::vec3 lightColor;
-		lightColor.x = sin(glfwGetTime() * 2.0f);
-		lightColor.y = sin(glfwGetTime() * 0.7f);
-		lightColor.z = sin(glfwGetTime() * 1.3f);
-		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
-		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
-		//program.setVec3("light.ambient", ambientColor);
-		//program.setVec3("light.diffuse", diffuseColor);
-		program.setVec3("light.ambient", glm::vec3(0.0f, 1.0f, 1.0f));
-		program.setVec3("light.diffuse", glm::vec3(1.0f, 1.0f, 0.0f));
-		program.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-		backpack.draw(program);
-
-		//model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
-		//program.setMat4("model", model);
-		//backpack.draw(program);
-
+		//Light position shader
+		lightPositionShader.use();
+		lightPositionShader.setMat4("projection", proj);
+		lightPositionShader.setMat4("view", view);
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+		lightPositionShader.setMat4("model", model);
+		backpack.draw(lightPositionShader);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
