@@ -59,7 +59,6 @@ void Mesh::draw(Shader &shader) {
 		//	number = std::to_string(normalsNr++); // post increment
 		//}
 
-		//shader.setFloat(("material." + name + number).c_str(), i);
 		shader.setFloat(("material." + name + number).c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 

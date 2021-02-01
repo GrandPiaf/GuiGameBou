@@ -32,7 +32,7 @@ void Camera::keyProcess(CameraMovement direction, float deltaTime) {
 	}
 }
 
-void Camera::mouseProcess(double xoffset, double yoffset) {
+void Camera::mouseProcess(float xoffset, float yoffset) {
 
 	xoffset *= m_sensitivity;
 	yoffset *= m_sensitivity;
@@ -51,8 +51,8 @@ void Camera::mouseProcess(double xoffset, double yoffset) {
 	updateCameraVectors();
 }
 
-void Camera::scrollProcess(double yoffset) {
-	m_fov -= (float)yoffset;
+void Camera::scrollProcess(float yoffset) {
+	m_fov -= yoffset;
 	if (m_fov < 1.0f) {
 		m_fov = 1.0f;
 	}

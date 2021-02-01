@@ -67,7 +67,7 @@ glm::vec3 pointLightPositions[] = {
 	glm::vec3(0.0f,  0.0f, -3.0f)
 };
 
-glm::vec3 cubePositions[] = {
+glm::vec3 testPositions[] = {
 	glm::vec3(0.0f,  0.0f,  0.0f),
 	glm::vec3(2.0f,  5.0f, -15.0f),
 	glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -79,6 +79,7 @@ glm::vec3 cubePositions[] = {
 	glm::vec3(1.5f,  0.2f, -1.5f),
 	glm::vec3(-1.3f,  1.0f, -1.5f)
 };
+
 
 int main(void) {
 	GLFWwindow *window;
@@ -100,19 +101,21 @@ int main(void) {
 
 	glfwMakeContextCurrent(window);
 
-	glfwSwapInterval(1);
+	//glfwSwapInterval(1);
 	// NOTE: OpenGL error checks have been omitted for brevity
+
+	// Callbacks
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	if (!gladLoadGL()) {
 		std::cerr << "Something went wrong!" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
-	// Callbacks
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
 	glDebugMessageCallback(opengl_error_callback, nullptr);
 
 	// UVs
@@ -124,37 +127,28 @@ int main(void) {
 	Shader modelShader{ "resources/shaders/shader.vert", "resources/shaders/shader.frag" };
 	modelShader.use();
 
-	//Shader lightPositionShader{ "resources/shaders/lightShader.vert", "resources/shaders/lightShader.frag" };
-
 	// Models
 	Model backpack("resources/models/backpack/backpack.obj");
 
 	//Options
 	glEnable(GL_DEPTH_TEST);
 
-	glm::mat4 view;
-	glm::mat4 proj;
-
 	while (!glfwWindowShouldClose(window)) {
 
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+		//std::cout << "DeltaTime : " << deltaTime << std::endl;
 
 		key_callback(window);
 
-		glfwGetFramebufferSize(window, &width, &height);
+		//glfwGetFramebufferSize(window, &width, &height);
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//Camera
-		proj = glm::perspective(glm::radians(camera.getFov()), (float)width / (float)height, 0.1f, 100.0f);
-		view = camera.getViewMatrix();
-
+		
 		modelShader.use();
-		modelShader.setMat4("proj", proj);
-		modelShader.setMat4("view", view);
 		modelShader.setVec3("viewPos", camera.getPosition());
 		modelShader.setFloat("material.shininess", 32.0f); //TODO : extract from assimp model
 
@@ -207,6 +201,12 @@ int main(void) {
 		modelShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
 		modelShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
 
+		//Camera
+		glm::mat4 proj = glm::perspective(glm::radians(camera.getFov()), (float)width / (float)height, 0.1f, 100.0f);
+		glm::mat4 view = camera.getViewMatrix();
+		modelShader.setMat4("proj", proj);
+		modelShader.setMat4("view", view);
+
 		// world transformation
 		glm::mat4 model = glm::mat4(1.0f);
 		modelShader.setMat4("model", model);
@@ -214,11 +214,13 @@ int main(void) {
 		//backpack.draw(modelShader);
 
 		for (unsigned int i = 0; i < 10; i++) {
+
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
+			model = glm::translate(model, testPositions[i]);
 			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			//model = glm::scale(model, glm::vec3(0.2f));
+			model = glm::scale(model, glm::vec3(0.3f));
+
 			modelShader.setMat4("model", model);
 
 			backpack.draw(modelShader);

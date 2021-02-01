@@ -19,5 +19,5 @@ void main()
     Normal = mat3(transpose(inverse(model))) * aNormal;
     TexCoord = aTexCoord;
 
-    gl_Position = proj * view * model * vec4(FragPos, 1.0);
+    gl_Position = proj * view * model * vec4(aPos, 1.0);
 }

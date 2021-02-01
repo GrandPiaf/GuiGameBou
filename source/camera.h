@@ -54,8 +54,8 @@ class Camera {
 		}
 
 		void keyProcess(CameraMovement direction, float deltaTime);
-		void mouseProcess(double xoffset, double yoffset);
-		void scrollProcess(double yoffset);
+		void mouseProcess(float xoffset, float yoffset);
+		void scrollProcess(float yoffset);
 
 		inline glm::mat4 getViewMatrix() const {
 			return glm::lookAt(m_position, m_position + m_front, m_up);
