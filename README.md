@@ -1,5 +1,7 @@
 # GuiGameBou
 
+[Work In Progress]
+
 Small OpenGL game project for the Real Time Rendering course of the Master 2 prog &amp; Dev at Gamagora. It features everything we tested during this course :
 
 - Model loading
